@@ -19,10 +19,14 @@ country_map = {
     'إيران': 'IRN', 'فلسطين': 'PSE', 'الإمارات': 'ARE', 'المغرب': 'MAR'
 }
 
-# 1. Load Data
+# 1. Load Data directly from Google Drive
 @st.cache_data
 def load_data():
-    df = pd.read_json("all_poems_database_cleaned.json")
+    # Your verified Google Drive Cleaned JSON File ID
+    FILE_ID = "1WTEhh069IFAe0_Qm0eRQcrdmxRhtfNU3"
+    google_drive_url = f"https://docs.google.com/uc?export=download&id={FILE_ID}"
+    
+    df = pd.read_json(google_drive_url)
     df = df[df['country'] != 'أحمد شوقي - أمير الشعراء']
     return df
 
@@ -39,7 +43,7 @@ selected_era = st.sidebar.selectbox("اختر العصر التاريخي:", all
 
 # Country Filter
 all_countries = ["كل الدول"] + list(df_raw[~df_raw['country'].isin(["Not specified", "غير محدد", "Unknown", ""])]['country'].unique())
-selected_country = st.sidebar.selectbox("اختر الدولة الجغرافية:", all_countries)
+selected_country = st.sidebar.selectbox("اخترة الدولة الجغرافية:", all_countries)
 
 # Apply Filters to a copy of the dataframe
 df = df_raw.copy()
@@ -107,10 +111,8 @@ with tab2:
     st.markdown("تحليل أولي للكلمات الأكثر استخداماً بناءً على الفلاتر المختارة:")
     
     if not df.empty:
-        # Quick tokenization mechanism for top words extraction
-        all_text = " ".join(df['full_poem_text'].astype(str).head(500)) # sampling first 500 for performance
+        all_text = " ".join(df['full_poem_text'].astype(str).head(500))
         words = re.findall(r'\b\w+\b', all_text)
-        # Exclude common short words manually to clean insights
         stop_words_fallback = ["من", "في", "على", "إلى", "أن", "ما", "لا", "الله", "عن", "يا", "و", "ف", "ب"]
         filtered_words = [w for w in words if len(w) > 2 and w not in stop_words_fallback]
         
@@ -125,13 +127,11 @@ with tab2:
 with tab3:
     st.subheader("👤 محرك البحث عن الشعراء واستكشاف دواوينهم")
     
-    # Search box for poet profiles
     poet_search = st.selectbox("اختر أو اكتب اسم الشاعر للاستعلام عنه:", [""] + list(df_raw['poet_name'].unique()))
     
     if poet_search != "":
         poet_data = df_raw[df_raw['poet_name'] == poet_search]
         
-        # Display Profile Card
         p_col1, p_col2, p_col3 = st.columns(3)
         with p_col1:
             st.info(f"**العصر التاريخي:** {poet_data['era'].iloc[0]}")
