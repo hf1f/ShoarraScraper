@@ -17,7 +17,7 @@ An end-to-end Data Engineering and NLP pipeline that scrapes, cleans, and visual
 
 ## 📂 Project Structure
 
-Based on the official repository structure (as seen in `image_7f9464.png`), the project consists of the following components:
+Based on the official repository structure, the project consists of the following components:
 
 ```text
 ├── scrapperCooP.py       # Multi-threaded web scraper for Arabic poetry data
